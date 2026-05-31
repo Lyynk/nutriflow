@@ -194,7 +194,6 @@ const DOM = {
   btnSaveSettings: document.getElementById('btn-save-settings'),
   settingsWaterInput: document.getElementById('settings-water-input'),
   btnSaveWaterSettings: document.getElementById('btn-save-water-settings'),
-  btnPopulateMock: document.getElementById('btn-populate-mock'),
   btnClearDb: document.getElementById('btn-clear-db')
 };
 
@@ -1100,70 +1099,7 @@ DOM.btnClearDb.addEventListener('click', () => {
   }
 });
 
-// Seed mock data for stunning first look demonstration
-DOM.btnPopulateMock.addEventListener('click', () => {
-  const today = new Date();
-  
-  // Set goals
-  state.calorieGoal = 2200;
-  state.proteinGoal = 160;
-  state.carbsGoal = 220;
-  state.fatGoal = 75;
-  state.waterGoal = 3000;
-  state.waterIntake = 1750;
 
-  // Add mock logs for today
-  state.loggedMeals = [
-    { id: 'mock1', name: 'Whey Protein shake with milk', calories: 290, protein: 32, carbs: 14, fat: 8, grams: 350, mealType: 'Breakfast', timestamp: Date.now() },
-    { id: 'mock2', name: 'Rolled Oats with Peanut Butter & Banana', calories: 480, protein: 18, carbs: 70, fat: 16, grams: 220, mealType: 'Breakfast', timestamp: Date.now() },
-    { id: 'mock3', name: 'Grilled Chicken Breast & Jasmine Rice', calories: 590, protein: 66, carbs: 56, fat: 8, grams: 450, mealType: 'Lunch', timestamp: Date.now() },
-    { id: 'mock4', name: 'Almonds and Red Gala Apple', calories: 230, protein: 5, carbs: 28, fat: 12, grams: 150, mealType: 'Snacks', timestamp: Date.now() }
-  ];
-
-  // Set mock weight historical chart curve
-  state.weightLogs = [
-    { date: '05-24', weight: 77.2 },
-    { date: '05-25', weight: 77.0 },
-    { date: '05-26', weight: 76.5 },
-    { date: '05-27', weight: 76.8 },
-    { date: '05-28', weight: 76.3 },
-    { date: '05-29', weight: 76.0 },
-    { date: '05-30', weight: 75.8 }
-  ];
-
-  // Set initial custom recipes
-  state.recipes = [
-    {
-      id: 'mock_recipe_1',
-      name: 'High Protein Oats Power Bowl',
-      servings: 1,
-      calories: 554,
-      protein: 42,
-      carbs: 72,
-      fat: 11,
-      ingredients: [
-        { name: 'Rolled Oats (Raw)', grams: 80, calories: 311, protein: 13.5, carbs: 53, fat: 5.5 },
-        { name: 'Whey Protein Powder', grams: 30, calories: 120, protein: 24, carbs: 1.8, fat: 1.8 },
-        { name: 'Banana', grams: 120, calories: 107, protein: 1.3, carbs: 27.6, fat: 0.4 },
-        { name: 'Greek Yogurt 0% (Plain)', grams: 150, calories: 88, protein: 15, carbs: 5.4, fat: 0.6 }
-      ]
-    }
-  ];
-
-  // Seed custom foods reflecting mock recipe
-  state.customFoods = [
-    { id: 'rcf_mock1', name: 'High Protein Oats Power Bowl (1 serving)', calories: 554, protein: 42, carbs: 72, fat: 11 }
-  ];
-
-  saveState();
-  alert('Loaded demo data for today! Check out the Today and Weight tabs.');
-  
-  // Reload current display
-  renderDashboard();
-  renderMealLogs();
-  renderRecipeList();
-  renderWeightTab();
-});
 
 /* ==========================================
    APPLE HEALTH SYNC SIMULATOR
