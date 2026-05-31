@@ -1,0 +1,75 @@
+# Codemagic CI/CD Build Configuration for NutriFlow
+
+workflows:
+  ios-capacitor:
+    name: NutriFlow iOS App Store Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    
+    # 1. Environment requirements
+    environment:
+      node: lts
+      xcode: latest # Uses the latest stable macOS/Xcode image
+      
+      # Set up App Store credentials group (defined in Codemagic dashboard)
+      groups:
+        - apple_credentials
+        
+    # 2. Automatically trigger builds on Git pushes to main branch
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+          source: true
+
+    # 3. Compilation script steps
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          npm install
+          
+      - name: Sync Web assets to iOS Project
+        script: |
+          npx cap sync ios
+          
+      - name: Set up iOS Code Signing
+        script: |
+          # Keychain configuration. Codemagic automatically injects your Apple profiles
+          # if you connect your developer account or upload them in the UI.
+          keychain initialize
+          # Fetch profiles from App Store Connect (if API key provided) or use local uploads
+          app-store-connect fetch-signing-files "com.nutriflow.app" --project-type ios --install-profiles
+          
+      - name: Build and Archive Xcode Project
+        script: |
+          # Navigate to native iOS folder and build archive
+          cd ios/App
+          xcodebuild \
+            -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            archive
+            
+      - name: Export IPA package
+        script: |
+          # Package the build archive into a distribution .ipa file
+          cd ios/App
+          xcodebuild \
+            -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportPath build/IPA \
+            -exportOptionsPlist ExportOptions.plist
+            
+    # 4. Save and expose the compiled App Store binary
+    artifacts:
+      - ios/App/build/IPA/*.ipa
+      
+    # 5. Automatically send build updates or email completions
+    publishing:
+      email:
+        recipients:
+          - lyynk@example.com # Replace with your email to receive build notices
+        allowed_failures: true
