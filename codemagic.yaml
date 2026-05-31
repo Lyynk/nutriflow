@@ -39,7 +39,7 @@ workflows:
           # Keychain configuration. Codemagic automatically injects your Apple profiles
           # if you connect your developer account or upload them in the UI.
           keychain initialize
-          app-store-connect fetch-signing-files --bundle-id com.nutriflow.app
+          app-store-connect fetch-signing-files com.nutriflow.app
           
       - name: Build and Archive Xcode Project
         script: |
