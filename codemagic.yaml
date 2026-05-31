@@ -32,7 +32,7 @@ workflows:
           
       - name: Sync Web assets to iOS Project
         script: |
-          npx cap sync ios
+          node node_modules/@capacitor/cli/bin/capacitor sync ios
           
       - name: Set up iOS Code Signing
         script: |
