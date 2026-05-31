@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>NutriFlow</title>
+  <!-- Responsive mobile scaling with iOS notch support -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- iOS web app capability meta tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NutriFlow">
+  <link rel="manifest" href="manifest.json">
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Stylesheet link -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Standalone Status Bar Buffer for iOS Standalone mode -->
+  <div class="status-bar-spacer"></div>
+
+  <!-- App Shell Container -->
+  <div class="app-container">
+    
+    <!-- App Header -->
+    <header class="app-header">
+      <h1 id="header-title">Today</h1>
+      <div class="header-action" id="header-today-btn">
+        <span class="dot active"></span>
+        <span id="header-date-str">May 31</span>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      
+      <!-- 1. DASHBOARD VIEW -->
+      <section id="view-dashboard" class="app-view active">
+        <!-- Calorie Rings Section -->
+        <div class="card rings-card">
+          <div class="rings-wrapper">
+            <!-- Overlapping iOS style activity rings -->
+            <svg class="activity-rings" viewBox="0 0 160 160">
+              <!-- Background Tracks -->
+              <circle class="ring-bg" cx="80" cy="80" r="65" stroke="#25161c" stroke-width="12"></circle>
+              <circle class="ring-bg" cx="80" cy="80" r="50" stroke="#102517" stroke-width="12"></circle>
+              <circle class="ring-bg" cx="80" cy="80" r="35" stroke="#13232c" stroke-width="12"></circle>
+              <!-- Progress Rings (Protein: Pink-Red, Carbs: Green, Fat: Cyan) -->
+              <circle id="ring-protein" class="ring-fg" cx="80" cy="80" r="65" stroke="url(#gradient-protein)" stroke-width="12" stroke-linecap="round" transform="rotate(-90 80 80)" stroke-dasharray="408.4" stroke-dashoffset="408.4"></circle>
+              <circle id="ring-carbs" class="ring-fg" cx="80" cy="80" r="50" stroke="url(#gradient-carbs)" stroke-width="12" stroke-linecap="round" transform="rotate(-90 80 80)" stroke-dasharray="314.1" stroke-dashoffset="314.1"></circle>
+              <circle id="ring-fat" class="ring-fg" cx="80" cy="80" r="35" stroke="url(#gradient-fat)" stroke-width="12" stroke-linecap="round" transform="rotate(-90 80 80)" stroke-dasharray="219.9" stroke-dashoffset="219.9"></circle>
+              
+              <!-- Definitions for Gradients -->
+              <defs>
+                <linearGradient id="gradient-protein" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff2d55" />
+                  <stop offset="100%" stop-color="#ff3b30" />
+                </linearGradient>
+                <linearGradient id="gradient-carbs" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#34c759" />
+                  <stop offset="100%" stop-color="#4cd964" />
+                </linearGradient>
+                <linearGradient id="gradient-fat" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#007aff" />
+                  <stop offset="100%" stop-color="#5ac8fa" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="rings-label">
+              <span id="calories-left-num">2,000</span>
+              <span class="unit">kcal left</span>
+            </div>
+          </div>
+
+          <!-- Calories Legend Grid -->
+          <div class="calories-grid">
+            <div class="cal-stat">
+              <span class="dot-indicator bg-orange"></span>
+              <div class="cal-val">
+                <span class="label">Goal</span>
+                <span id="cal-goal-val">2,000</span>
+              </div>
+            </div>
+            <div class="cal-stat">
+              <span class="dot-indicator bg-green"></span>
+              <div class="cal-val">
+                <span class="label">Food</span>
+                <span id="cal-food-val">0</span>
+              </div>
+            </div>
+            <div class="cal-stat">
+              <span class="dot-indicator bg-blue"></span>
+              <div class="cal-val">
+                <span class="label">Remaining</span>
+                <span id="cal-remain-val">2,000</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Macronutrients Card -->
+        <div class="card macros-card">
+          <h3>Macros Tracker</h3>
+          <div class="macros-flex">
+            <div class="macro-bar-container protein">
+              <div class="macro-info">
+                <span>Protein</span>
+                <span id="macro-protein-ratio">0g / 150g</span>
+              </div>
+              <div class="bar-bg"><div id="bar-protein" class="bar-fill" style="width: 0%"></div></div>
+            </div>
+            <div class="macro-bar-container carbs">
+              <div class="macro-info">
+                <span>Carbs</span>
+                <span id="macro-carbs-ratio">0g / 200g</span>
+              </div>
+              <div class="bar-bg"><div id="bar-carbs" class="bar-fill" style="width: 0%"></div></div>
+            </div>
+            <div class="macro-bar-container fat">
+              <div class="macro-info">
+                <span>Fat</span>
+                <span id="macro-fat-ratio">0g / 67g</span>
+              </div>
+              <div class="bar-bg"><div id="bar-fat" class="bar-fill" style="width: 0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Log & Water Tracking Grid -->
+        <div class="grid-2-col">
+          <!-- Water Tracking Card -->
+          <div class="card water-card">
+            <div class="water-header">
+              <h3>Hydration</h3>
+              <span id="water-ratio-label">0 / 2500 ml</span>
+            </div>
+            <div class="water-display">
+              <div class="water-glass">
+                <div class="water-liquid" id="water-liquid" style="height: 0%">
+                  <!-- Floating bubbles animation -->
+                  <div class="bubble"></div>
+                  <div class="bubble"></div>
+                  <div class="bubble"></div>
+                </div>
+                <div class="glass-glare"></div>
+              </div>
+              <button class="btn-water-add" id="btn-add-water">
+                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>250ml</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Shortcuts/Weight Quick Card -->
+          <div class="card quick-weight-card">
+            <h3>Daily Weight</h3>
+            <div class="weight-flex">
+              <div class="weight-circle">
+                <span id="weight-current-label">75.0</span>
+                <span class="unit">kg</span>
+              </div>
+              <div class="weight-action">
+                <input type="number" id="input-quick-weight" placeholder="Log weight" step="0.1">
+                <button class="btn-primary-small" id="btn-submit-weight">Log</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. MEALS LOG VIEW -->
+      <section id="view-meals" class="app-view">
+        <!-- Meal Categories List -->
+        <div class="meals-list-container">
+          <!-- Breakfast -->
+          <div class="meal-group-card">
+            <div class="meal-group-header">
+              <div class="title-with-icon">
+                <div class="icon-wrap breakfast">🥞</div>
+                <div>
+                  <h4>Breakfast</h4>
+                  <span class="meal-time">Recommended: 400-600 kcal</span>
+                </div>
+              </div>
+              <div class="meal-group-summary">
+                <span id="breakfast-calories-sum" class="calories-val">0 kcal</span>
+                <button class="btn-add-meal-quick" data-meal-type="Breakfast">
+                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </div>
+            </div>
+            <div class="meal-group-items" id="meal-items-Breakfast">
+              <div class="no-items-placeholder">No logged foods yet. Tap + to add.</div>
+            </div>
+          </div>
+
+          <!-- Lunch -->
+          <div class="meal-group-card">
+            <div class="meal-group-header">
+              <div class="title-with-icon">
+                <div class="icon-wrap lunch">🥗</div>
+                <div>
+                  <h4>Lunch</h4>
+                  <span class="meal-time">Recommended: 600-800 kcal</span>
+                </div>
+              </div>
+              <div class="meal-group-summary">
+                <span id="lunch-calories-sum" class="calories-val">0 kcal</span>
+                <button class="btn-add-meal-quick" data-meal-type="Lunch">
+                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </div>
+            </div>
+            <div class="meal-group-items" id="meal-items-Lunch">
+              <div class="no-items-placeholder">No logged foods yet. Tap + to add.</div>
+            </div>
+          </div>
+
+          <!-- Dinner -->
+          <div class="meal-group-card">
+            <div class="meal-group-header">
+              <div class="title-with-icon">
+                <div class="icon-wrap dinner">🥩</div>
+                <div>
+                  <h4>Dinner</h4>
+                  <span class="meal-time">Recommended: 600-800 kcal</span>
+                </div>
+              </div>
+              <div class="meal-group-summary">
+                <span id="dinner-calories-sum" class="calories-val">0 kcal</span>
+                <button class="btn-add-meal-quick" data-meal-type="Dinner">
+                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </div>
+            </div>
+            <div class="meal-group-items" id="meal-items-Dinner">
+              <div class="no-items-placeholder">No logged foods yet. Tap + to add.</div>
+            </div>
+          </div>
+
+          <!-- Snacks -->
+          <div class="meal-group-card">
+            <div class="meal-group-header">
+              <div class="title-with-icon">
+                <div class="icon-wrap snacks">🍎</div>
+                <div>
+                  <h4>Snacks</h4>
+                  <span class="meal-time">Recommended: 100-300 kcal</span>
+                </div>
+              </div>
+              <div class="meal-group-summary">
+                <span id="snacks-calories-sum" class="calories-val">0 kcal</span>
+                <button class="btn-add-meal-quick" data-meal-type="Snacks">
+                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                </button>
+              </div>
+            </div>
+            <div class="meal-group-items" id="meal-items-Snacks">
+              <div class="no-items-placeholder">No logged foods yet. Tap + to add.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. RECIPES VIEW -->
+      <section id="view-recipes" class="app-view">
+        <!-- Recipe Calculator Widget -->
+        <div class="card recipe-calc-card">
+          <div class="card-header-flex">
+            <h3>Recipe Nutrient Calculator</h3>
+            <span class="badge">Auto-Sum</span>
+          </div>
+          <p class="section-desc">Add multiple ingredients to calculate the total nutrients, divide by servings, and save it as a reusable food item.</p>
+          
+          <div class="recipe-form">
+            <div class="form-group">
+              <label for="recipe-name-input">Recipe Name</label>
+              <input type="text" id="recipe-name-input" placeholder="e.g. Protein Banana Oatmeal Pancakes">
+            </div>
+            <div class="form-group-row">
+              <div class="form-group">
+                <label for="recipe-servings-input">Servings</label>
+                <input type="number" id="recipe-servings-input" value="1" min="1" step="1">
+              </div>
+              <div class="form-group-action">
+                <button class="btn-secondary" id="btn-open-recipe-food-search">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  Add Ingredient
+                </button>
+              </div>
+            </div>
+
+            <!-- Current Ingredient List -->
+            <div class="ingredients-list-wrap">
+              <h5>Ingredients List</h5>
+              <div id="recipe-ingredients-container">
+                <div class="no-ingredients-placeholder">No ingredients added yet. Tap "Add Ingredient" above.</div>
+              </div>
+            </div>
+
+            <!-- Recipe Summary Panel -->
+            <div class="recipe-summary-box">
+              <div class="sum-header">Nutrient Calculations</div>
+              <div class="sum-grid">
+                <div class="sum-stat">
+                  <span class="label">Calories</span>
+                  <span id="recipe-cal-total">0 kcal</span>
+                  <span class="sub" id="recipe-cal-per-serving">0 kcal / serving</span>
+                </div>
+                <div class="sum-stat">
+                  <span class="label">Protein</span>
+                  <span id="recipe-p-total">0g</span>
+                  <span class="sub" id="recipe-p-per-serving">0g / serving</span>
+                </div>
+                <div class="sum-stat">
+                  <span class="label">Carbs</span>
+                  <span id="recipe-c-total">0g</span>
+                  <span class="sub" id="recipe-c-per-serving">0g / serving</span>
+                </div>
+                <div class="sum-stat">
+                  <span class="label">Fat</span>
+                  <span id="recipe-f-total">0g</span>
+                  <span class="sub" id="recipe-f-per-serving">0g / serving</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-primary w-100" id="btn-save-recipe" disabled>Save Recipe as Custom Food</button>
+          </div>
+        </div>
+
+        <!-- Saved Recipes List -->
+        <div class="saved-recipes-section">
+          <h3>Your Recipes</h3>
+          <div id="saved-recipes-list" class="recipe-cards-grid">
+            <!-- Dynamic list of saved recipes -->
+            <div class="no-items-placeholder">You haven't created any recipes yet. Use the calculator above to start.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. WEIGHT TRACKER VIEW -->
+      <section id="view-weight" class="app-view">
+        <!-- Weight Graph Card -->
+        <div class="card chart-card">
+          <div class="chart-header">
+            <div>
+              <h3>Weight Trend</h3>
+              <p class="chart-subtitle">Last 7 Logs</p>
+            </div>
+            <div class="weight-summary">
+              <span id="weight-trend-stat">--</span>
+              <span class="unit">kg avg</span>
+            </div>
+          </div>
+          <!-- SVG Weight Chart -->
+          <div class="chart-container">
+            <svg id="weight-chart" viewBox="0 0 320 180" width="100%" height="180">
+              <!-- Grid Lines -->
+              <line x1="40" y1="20" x2="300" y2="20" stroke="#1d1d24" stroke-width="1"></line>
+              <line x1="40" y1="60" x2="300" y2="60" stroke="#1d1d24" stroke-width="1"></line>
+              <line x1="40" y1="100" x2="300" y2="100" stroke="#1d1d24" stroke-width="1"></line>
+              <line x1="40" y1="140" x2="300" y2="140" stroke="#1d1d24" stroke-width="1"></line>
+              
+              <!-- Placeholder Chart path, will be updated via JS -->
+              <path id="chart-path" d="" fill="none" stroke="#007aff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path id="chart-area-path" d="" fill="url(#chart-gradient)" opacity="0.15"></path>
+              
+              <defs>
+                <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#007aff" />
+                  <stop offset="100%" stop-color="#007aff" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              
+              <!-- Data Points (rendered by JS) -->
+              <g id="chart-points"></g>
+              <!-- X and Y Axis Labels (rendered by JS) -->
+              <g id="chart-labels"></g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Weight History Card -->
+        <div class="card history-card">
+          <h3>Weight History</h3>
+          <div class="weight-history-list" id="weight-history-list">
+            <!-- Rendered by JS -->
+            <div class="no-items-placeholder">No weight history logged yet.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. SETTINGS VIEW -->
+      <section id="view-settings" class="app-view">
+        <!-- Daily Goal Targets Card -->
+        <div class="card settings-card">
+          <h3>Daily Nutrient Targets</h3>
+          <div class="settings-form">
+            <div class="form-group">
+              <label for="settings-cal-input">Calorie Target (kcal)</label>
+              <input type="number" id="settings-cal-input" value="2000" min="1000" max="10000" step="50">
+            </div>
+            
+            <div class="macro-percentage-split">
+              <h4>Macronutrient Target Ratios</h4>
+              <div class="percentage-split-grid">
+                <div class="form-group">
+                  <label for="settings-p-input">Protein (g)</label>
+                  <input type="number" id="settings-p-input" value="150" min="20" max="500">
+                </div>
+                <div class="form-group">
+                  <label for="settings-c-input">Carbs (g)</label>
+                  <input type="number" id="settings-c-input" value="200" min="20" max="800">
+                </div>
+                <div class="form-group">
+                  <label for="settings-f-input">Fat (g)</label>
+                  <input type="number" id="settings-f-input" value="67" min="10" max="300">
+                </div>
+              </div>
+              <p class="helper-text" id="macro-settings-helper">Goals: 150g Protein (600 kcal) • 200g Carbs (800 kcal) • 67g Fat (603 kcal) = 2003 kcal total.</p>
+            </div>
+            
+            <button class="btn-primary w-100" id="btn-save-settings">Save Target Goals</button>
+          </div>
+        </div>
+
+        <!-- Hydration Target Card -->
+        <div class="card settings-card">
+          <h3>Hydration Target</h3>
+          <div class="settings-form">
+            <div class="form-group">
+              <label for="settings-water-input">Water Goal (ml)</label>
+              <input type="number" id="settings-water-input" value="2500" min="500" max="10000" step="250">
+            </div>
+            <button class="btn-primary w-100" id="btn-save-water-settings">Save Water Goal</button>
+          </div>
+        </div>
+
+        <!-- Apple Health Sync Card -->
+        <div class="card settings-card">
+          <div class="card-header-flex" style="margin-bottom: 12px;">
+            <h3>Apple Health Sync</h3>
+            <span class="badge" style="background-color: rgba(255, 45, 85, 0.15); color: #ff2d55; padding: 4px 10px;">HealthKit</span>
+          </div>
+          <p class="section-desc">Connect NutriFlow with the iOS Health app to sync calories, macronutrients, and water logs.</p>
+          <div id="apple-health-status-container">
+            <!-- Rendered by JS -->
+            <button class="btn-primary w-100" id="btn-connect-apple-health" style="background: linear-gradient(135deg, #ff2d55 0%, #ff3b30 100%);">
+              Connect to Apple Health
+            </button>
+          </div>
+        </div>
+
+        <!-- Diagnostics & Presets Card -->
+        <div class="card settings-card danger-zone">
+          <h3>Database Settings</h3>
+          <p class="section-desc">Manage local storage cache on this device.</p>
+          <div class="settings-buttons">
+            <button class="btn-secondary" id="btn-populate-mock">Populate Mock Data</button>
+            <button class="btn-danger" id="btn-clear-db">Clear Local Storage</button>
+          </div>
+        </div>
+
+        <!-- App Information -->
+        <div class="app-info-footer">
+          <p>NutriFlow v1.0.0 • iOS Progressive Web App</p>
+          <p class="developer">Tap "Add to Home Screen" to install offline</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Navigation Tab Bar -->
+    <nav class="app-tabbar">
+      <button class="tabbar-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-dashboard"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+        <span>Today</span>
+      </button>
+      <button class="tabbar-item" data-view="meals">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-meals"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        <span>Meals</span>
+      </button>
+      <button class="tabbar-item" data-view="recipes">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-recipes"><path d="M12 2v20M2 12h20"></path></svg>
+        <span>Recipes</span>
+      </button>
+      <button class="tabbar-item" data-view="weight">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-weight"><path d="M3 3v18h18"></path><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"></path></svg>
+        <span>Weight</span>
+      </button>
+      <button class="tabbar-item" data-view="settings">
+        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="icon-settings"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <!-- SEARCH & LOG FOOD FULL-SCREEN iOS SLIDEOUT DRAWER -->
+    <div class="ios-drawer" id="food-search-drawer">
+      <div class="drawer-overlay" id="drawer-overlay-btn"></div>
+      <div class="drawer-sheet">
+        <header class="drawer-header">
+          <button class="btn-cancel" id="btn-close-search">Cancel</button>
+          <h2 id="search-drawer-title">Add Food</h2>
+          <button class="btn-action-primary" id="btn-confirm-add" disabled>Add</button>
+        </header>
+
+        <div class="drawer-body">
+          <!-- Search Bar -->
+          <div class="search-input-wrap">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="food-search-input" placeholder="Search foods (e.g. Rice, Chicken, Banana)..." autocomplete="off">
+          </div>
+
+          <!-- Search Results / Custom Food Flex -->
+          <div class="search-layout">
+            
+            <!-- Food Results List -->
+            <div class="food-results-section">
+              <div class="results-header" id="results-count-label">Popular Foods</div>
+              <div class="food-list" id="food-search-results">
+                <!-- Javascript will load food options here -->
+              </div>
+            </div>
+
+            <!-- Portion / Weight Config Card (visible when a food item is selected) -->
+            <div class="card selected-food-card" id="selected-food-details" style="display: none;">
+              <div class="selected-header">
+                <h4 id="selected-food-name">Chicken Breast</h4>
+                <span class="base-info" id="selected-food-base-info">100g = 165 kcal</span>
+              </div>
+              
+              <div class="portion-form">
+                <div class="slider-group">
+                  <div class="slider-header">
+                    <label for="food-weight-slider">Portion Weight</label>
+                    <span class="weight-display"><span id="food-weight-val">100</span> g</span>
+                  </div>
+                  <input type="range" id="food-weight-slider" min="5" max="500" value="100" step="5">
+                </div>
+                
+                <div class="macro-breakdown-card">
+                  <div class="mb-title">Selected Portion Nutrients</div>
+                  <div class="mb-grid">
+                    <div class="mb-stat">
+                      <span id="sf-calories">165</span>
+                      <span class="lbl">kcal</span>
+                    </div>
+                    <div class="mb-stat">
+                      <span id="sf-protein">31g</span>
+                      <span class="lbl">Protein</span>
+                    </div>
+                    <div class="mb-stat">
+                      <span id="sf-carbs">0g</span>
+                      <span class="lbl">Carbs</span>
+                    </div>
+                    <div class="mb-stat">
+                      <span id="sf-fat">3.6g</span>
+                      <span class="lbl">Fat</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Create a Custom Food Widget (when not found in search) -->
+            <div class="card create-custom-food-card">
+              <h4>Can't find your food?</h4>
+              <p>Create a custom food item to add to your list.</p>
+              <div class="custom-food-form">
+                <div class="form-group">
+                  <input type="text" id="cf-name" placeholder="Food Name (e.g. Whey Protein Powder)">
+                </div>
+                <div class="custom-food-grid">
+                  <div class="form-group">
+                    <label>Kcal per 100g</label>
+                    <input type="number" id="cf-cal" placeholder="kcal">
+                  </div>
+                  <div class="form-group">
+                    <label>Protein (g)</label>
+                    <input type="number" id="cf-p" placeholder="g">
+                  </div>
+                  <div class="form-group">
+                    <label>Carbs (g)</label>
+                    <input type="number" id="cf-c" placeholder="g">
+                  </div>
+                  <div class="form-group">
+                    <label>Fat (g)</label>
+                    <input type="number" id="cf-f" placeholder="g">
+                  </div>
+                </div>
+                <button class="btn-secondary w-100" id="btn-create-custom-food">Create & Add Custom Food</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- APPLE HEALTH PERMISSION OVERLAY DRAWER -->
+  <div class="ios-drawer" id="apple-health-drawer">
+    <div class="drawer-overlay" id="health-overlay-btn"></div>
+    <div class="drawer-sheet" style="height: 90%; background-color: #000; border-top-left-radius: 20px; border-top-right-radius: 20px;">
+      <header class="drawer-header" style="background-color: #1c1c1e; border-bottom: 1px solid #2c2c2e; padding: 0 16px;">
+        <button class="btn-cancel" id="btn-health-cancel" style="color: #ff3b30;">Cancel</button>
+        <h2 style="color: #fff;">Health Access</h2>
+        <button class="btn-action-primary" id="btn-health-allow" style="color: #30d158; font-weight: 600;">Allow</button>
+      </header>
+      <div class="drawer-body" style="padding: 24px; color: #fff; background-color: #000; overflow-y: auto;">
+        <div class="health-app-branding" style="text-align: center; margin-bottom: 28px;">
+          <div style="font-size: 52px; margin-bottom: 12px;">❤️</div>
+          <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 6px; color: #fff;">Health Permissions</h3>
+          <p style="font-size: 13px; color: #8e8e93; line-height: 1.4; max-width: 280px; margin: 0 auto;">Select the data NutriFlow is allowed to share and write to the Apple Health app.</p>
+        </div>
+        
+        <div class="health-permission-section" style="margin-bottom: 28px;">
+          <h4 style="font-size: 11px; font-weight: 600; color: #8e8e93; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px;">Allow NutriFlow to write:</h4>
+          
+          <div class="health-switch-card" style="background-color: #1c1c1e; border-radius: 14px; border: 1px solid #2c2c2e; padding: 14px 16px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 600; font-size: 15px; color: #fff;">Active Energy (Calories)</div>
+                <div style="font-size: 11px; color: #8e8e93; margin-top: 2px;">Sync daily logged meals calories</div>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="hs-calories" checked>
+                <span class="ios-switch-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="health-switch-card" style="background-color: #1c1c1e; border-radius: 14px; border: 1px solid #2c2c2e; padding: 14px 16px; margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 600; font-size: 15px; color: #fff;">Dietary Macronutrients</div>
+                <div style="font-size: 11px; color: #8e8e93; margin-top: 2px;">Sync daily protein, carbs, and fat logs</div>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="hs-macros" checked>
+                <span class="ios-switch-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="health-switch-card" style="background-color: #1c1c1e; border-radius: 14px; border: 1px solid #2c2c2e; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 600; font-size: 15px; color: #fff;">Water Hydration</div>
+                <div style="font-size: 11px; color: #8e8e93; margin-top: 2px;">Sync daily logged water consumption</div>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="hs-water" checked>
+                <span class="ios-switch-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <p class="section-desc" style="font-size: 11px; text-align: center; line-height: 1.4; color: #8e8e93; max-width: 320px; margin: 0 auto;">As a Progressive Web App, this interface simulates iOS HealthKit permission requests. Real-time background background integration requires packaging the PWA inside a native shell container (e.g. Capacitor).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Javascript entry link -->
+  <script src="app.js"></script>
+</body>
+</html>
