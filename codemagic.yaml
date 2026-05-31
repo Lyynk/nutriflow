@@ -34,37 +34,23 @@ workflows:
         script: |
           node node_modules/@capacitor/cli/bin/capacitor sync ios
           
-      - name: Set up iOS Code Signing
+      - name: Build and Archive Xcode Project (Unsigned)
         script: |
-          # Keychain configuration. Codemagic automatically injects your Apple profiles
-          # if you connect your developer account or upload them in the UI.
-          keychain initialize
-          app-store-connect fetch-signing-files com.nutriflow.app
-          
-      - name: Build and Archive Xcode Project
-        script: |
-          # Navigate to native iOS folder and build archive
           cd ios/App
           xcodebuild \
             -workspace App.xcworkspace \
             -scheme App \
             -configuration Release \
             -archivePath build/App.xcarchive \
-            archive
+            archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            PROVISIONING_PROFILE_SPECIFIER=""
             
-      - name: Export IPA package
-        script: |
-          # Package the build archive into a distribution .ipa file
-          cd ios/App
-          xcodebuild \
-            -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportPath build/IPA \
-            -exportOptionsPlist ExportOptions.plist
-            
-    # 4. Save and expose the compiled App Store binary
+    # 4. Save and expose the compiled App Store project archive
     artifacts:
-      - ios/App/build/IPA/*.ipa
+      - ios/App/build/App.xcarchive
       
     # 5. Automatically send build updates or email completions
     publishing:
